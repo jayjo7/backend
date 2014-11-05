@@ -69,13 +69,12 @@ public class SynchronizeSheets {
         // Iterate through all of the spreadsheets returned
         System.out.println("Here is all availabe SpreadSheets - Start");
 
-            for (SpreadsheetEntry spreadsheet : spreadsheets) {
-                // Print the title of this spreadsheet to the screen
+        spreadsheets.stream().map((spreadsheet) -> {
                 System.out.println(spreadsheet.getTitle().getPlainText());
-
+                return spreadsheet;
+            }).forEach((_item) -> {
                 System.out.println("Here is all availabe SpreadSheets - End");
-
-            }
+            });
         System.out.println("Here is all availabe SpreadSheets - End");
 
         for (SpreadsheetEntry spreadsheet : spreadsheets) {
@@ -108,6 +107,12 @@ public class SynchronizeSheets {
             
             for( WorksheetEntry worksheet : worksheetsList)
             {
+                if("orders".equalsIgnoreCase(worksheet.getTitle().getPlainText()))
+                {
+                    System.out.println("Skip the work sheet : " +worksheet.getTitle().getPlainText());
+                }
+                else
+                {
 
             // Fetch the list feed of the worksheet.
             URL listFeedUrl = worksheet.getListFeedUrl();
@@ -121,14 +126,14 @@ public class SynchronizeSheets {
                 // Iterate over the remaining columns, and print each cell value
 
                 Map<String, String> spreadSheeRowMap = new HashMap<>();
-                for (String tag : row.getCustomElements().getTags()) {
-
+                row.getCustomElements().getTags().stream().map((tag) -> {
                     System.out.print(row.getCustomElements().getValue(tag)
                             + "\t");
+                    return tag;
+                }).forEach((tag) -> {
                     spreadSheeRowMap.put(tag,
                             row.getCustomElements().getValue(tag));
-
-                }
+                });
                 spreadSheetMap.put(spreadSheeRowMap.get("webid"),
                         spreadSheeRowMap);
                 System.out.println("Size of spreadSheeRowMap : "
@@ -145,6 +150,7 @@ public class SynchronizeSheets {
         System.out.println("Done WorkSheet Name : " + worksheet.getTitle().getPlainText());
 
     
+            }
             }
         }
     }

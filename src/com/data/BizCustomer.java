@@ -10,6 +10,6 @@ package com.data;
  *
  * @author jayakumar
  */
-public class BizCustomer {
+public class BizCustomer extends Customer {
     
 }
