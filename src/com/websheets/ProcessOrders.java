@@ -63,7 +63,11 @@ private static void updateOrderStatusToInProcess(ArrayList<Order> orders) throws
         criteriaMap.put("_id", order.getId());
         criteriaMap.put("status", "new");
     
-        DataBaseAccess.updateCollection("orders", criteriaMap, "status", "inProcess", false, false);
+                HashMap<String, String> toValue = new HashMap<>();
+                toValue.put("status", "inProcess");
+                toValue.put("progress", "Sheet Updated");
+        
+        DataBaseAccess.updateCollection("orders", criteriaMap, toValue, false, false);
                // DataBaseAccess.updateById("order", order.getId(),"status", "inProcess" );
 
     }

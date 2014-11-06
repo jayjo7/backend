@@ -116,7 +116,16 @@ public class DataBaseAccess {
 
        // DataBaseAccess.getOrders("orders", "status", "new");
        // DataBaseAccess.updateCollection("orders", null,"status",   "inprocess","new", false, true);
-        DataBaseAccess.updateById("orders", "48wsudthWQvgEp4p4", "status", "inProcess");
+       // DataBaseAccess.updateById("orders", "48wsudthWQvgEp4p4", "status", "inProcess");
+        
+        HashMap<String, String> condition = new HashMap<>();
+        condition.put("_id", "GGAtWqevF7JgXpEnt");
+        
+                HashMap<String, String> toValue = new HashMap<>();
+                toValue.put("status", "inProcess");
+                toValue.put("progress", "Sheet Updated");
+        
+        DataBaseAccess.updateCollection("orders", condition, toValue, false, false);
       // DBCursor dbCursor = dba.getDBCursor("orders", "status", "new");
         //System.out.println ("dbCursor = " + dbCursor);
        
@@ -177,6 +186,43 @@ public class DataBaseAccess {
                 
 		DBObject modifiedObject =new BasicDBObject();
 		modifiedObject.put("$set", new BasicDBObject().append(fieldName,toValue));
+		System.out.println("modifiedObject : " + modifiedObject);
+
+		dbCollection.update(searchObject, modifiedObject,upsert,multi);
+        
+    }
+    
+        public static  void updateCollection(   String collectionName, 
+                                            HashMap<String, String> condition,
+                                            HashMap<String, String> toValues ,
+                                            boolean upsert, 
+                                            boolean multi ) throws UnknownHostException
+    {
+    		DBCollection dbCollection= DataBaseAccess.getCollection(collectionName);
+		BasicDBObject searchObject = new BasicDBObject();
+                if(condition != null && ! condition.isEmpty())
+                {
+                    condition.keySet().stream().forEach((key) -> {
+                            searchObject.put(key, condition.get(key));
+                        });
+                }
+		
+                System.out.println("searchObject : " + searchObject);
+                
+		DBObject modifiedObject =new BasicDBObject();
+                
+                BasicDBObject dbObjectValues = new BasicDBObject();
+                
+                
+                if(toValues !=null && !toValues.isEmpty())
+                {
+                    for(String key : toValues.keySet())
+                    {
+                        dbObjectValues.append(key, toValues.get(key));
+                    }
+                }
+                
+		modifiedObject.put("$set", dbObjectValues);
 		System.out.println("modifiedObject : " + modifiedObject);
 
 		dbCollection.update(searchObject, modifiedObject,upsert,multi);
