@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.util;
 
+import com.dto.EmailDTO;
 import java.net.MalformedURLException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,60 +23,38 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
  * @author jayakumar
  */
 public class Email {
-    
-    
-    public Email() throws MalformedURLException
-    {
+
+    public Email() throws MalformedURLException {
     }
-    
-public static Response SendSimpleMessage() {
-    
-    
-     HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
-     .nonPreemptive().credentials("api", "key-1180c0836cb719598c0d9448c0a9f400").build();
-     
-     
-    
-       Client client = ClientBuilder.newClient();
+
+    public static Response SendSimpleMessage(EmailDTO emailDTO) {
+
+        HttpAuthenticationFeature feature = HttpAuthenticationFeature.basicBuilder()
+                .nonPreemptive().credentials("api", emailDTO.getApiKey()).build();
+
+        Client client = ClientBuilder.newClient();
         client.register(feature);
 
- 
-WebTarget webTarget = client.target("https://api.mailgun.net/v2/websheet.co");
-WebTarget resourceWebTarget = webTarget.path("messages");
+        WebTarget webTarget = client.target(emailDTO.getTargetURL());
+        WebTarget resourceWebTarget = webTarget.path(emailDTO.getResourcePath());
 
+        MultivaluedMap<String, String> mvm = new MultivaluedHashMap<>();
 
-/**
-    EmailInfo ei = new EmailInfo();
-    ei.setFrom("WebSheets.io<jayjo7@hotmail.com>");
+        mvm.add("from", emailDTO.getFrom());
+        mvm.add("to", emailDTO.getTo());
+        mvm.add("subject", emailDTO.getSubject());
+        mvm.add("text", emailDTO.getText());
 
+        Invocation.Builder invocationBuilder
+                = resourceWebTarget.request(MediaType.APPLICATION_FORM_URLENCODED);
 
-ei.setTo( "jayjo7@hotmail.com");
-ei.setSubject("Order Received");
-ei.setText("We have received your order, you will receive another email on when to pick up your order");
+        Response response = invocationBuilder.post(Entity.form(mvm));
+        System.out.println(response.getStatus());
+        System.out.println(response.readEntity(String.class));
+        return response;
 
- */
-MultivaluedMap<String, String> mvm = new MultivaluedHashMap<>();
+    }
 
-mvm.add("from", "WebSheets.io<jayjo7@hotmail.com>");
-mvm.add("to", "jayjo7@hotmail.com");
-mvm.add("subject", "Order Received");
-mvm.add("text", "We have received your order, you will receive another email on when to pick up your order");
+  
 
- 
-Invocation.Builder invocationBuilder =
-        resourceWebTarget.request(MediaType.APPLICATION_FORM_URLENCODED);
-
- 
-Response response = invocationBuilder.post(Entity.form(mvm));
-System.out.println(response.getStatus());
-System.out.println(response.readEntity(String.class));      
-return response;       
-
-}
-
-public static void main(String[] args)
-{
-    Response response = Email.SendSimpleMessage() ;
-}
-    
 }
